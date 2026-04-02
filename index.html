@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>InfoFlow - Информационные процессы человека</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6edfc 100%);
+            color: #1a2c3e;
+            line-height: 1.5;
+        }
+
+        /* Навигация */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            transition: transform 0.2s;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            padding: 0.25rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #1e3c72;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #2a5298;
+            color: #2a5298;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #2a5298;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 0.4rem 1rem 0.4rem 1.5rem;
+            border-radius: 50px;
+            color: white;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Контент страниц */
+        .page {
+            display: none;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Карточки */
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: #1e3c72;
+            margin: 1.5rem 0 1rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin: 1rem 0 0.5rem;
+        }
+
+        /* Сетка для типов процессов */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .process-card {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border-left: 4px solid #2a5298;
+            transition: 0.3s;
+        }
+
+        .process-card:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Формы */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-family: inherit;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 60, 114, 0.3);
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+        }
+
+        /* Баннер */
+        .hero {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 28px;
+            padding: 3rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            color: white;
+            background: none;
+            margin-bottom: 1rem;
+        }
+
+        /* Футер */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #5a6e7c;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+            }
+            .nav-links {
+                justify-content: center;
+            }
+            .page {
+                padding: 0 1rem;
+            }
+            .hero {
+                padding: 2rem 1rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="#" class="logo" onclick="showPage('home')">Info<span>Flow</span></a>
+        <div class="nav-links">
+            <a href="#" onclick="showPage('home')">Главная</a>
+            <a href="#" onclick="showPage('types')">Типы информационных процессов</a>
+            <a href="#" onclick="showPage('suggestion')">Предложение редакции</a>
+        </div>
+        <div id="authButtons">
+            <button class="btn-outline" onclick="showAuthModal('login')">Вход</button>
+            <button class="btn-primary" onclick="showAuthModal('register')">Регистрация</button>
+        </div>
+        <div id="userInfo" style="display: none;">
+            <div class="user-info">
+                <span>👤 <span id="currentUsername"></span></span>
+                <button class="logout-btn" onclick="logout()">Выйти</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ГЛАВНАЯ СТРАНИЦА -->
+<div id="homePage" class="page active">
+    <div class="hero">
+        <h1>Информационные процессы человека</h1>
+        <p style="font-size: 1.2rem; max-width: 700px; margin: 0 auto;">Как мы собираем, передаём, обрабатываем и храним информацию в цифровую эпоху</p>
+    </div>
+
+    <div class="card">
+        <h2>📌 Что такое информационные процессы?</h2>
+        <p>Информационные процессы — это действия, связанные с получением, передачей, обработкой, хранением и использованием информации. Они являются основой человеческой деятельности, познания мира и развития технологий. В современном обществе управление информационными процессами определяет эффективность обучения, работы и повседневной жизни.</p>
+    </div>
+
+    <div class="card">
+        <h2>⚙️ Основные информационные процессы</h2>
+        <div class="process-grid">
+            <div class="process-card"><strong>📡 Сбор информации</strong><br>Получение данных из внешней среды через органы чувств, устройства, интернет.</div>
+            <div class="process-card"><strong>📤 Передача информации</strong><br>Обмен данными между людьми, системами, устройствами.</div>
+            <div class="process-card"><strong>⚙️ Обработка информации</strong><br>Преобразование данных для получения новых знаний, анализ, структурирование.</div>
+            <div class="process-card"><strong>💾 Хранение информации</strong><br>Сохранение данных во времени для последующего использования.</div>
+            <div class="process-card"><strong>🎯 Использование информации</strong><br>Применение знаний для принятия решений, обучения, творчества.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🌐 Информационные процессы в цифровом мире</h2>
+        <p>С развитием интернета и искусственного интеллекта информационные процессы ускорились многократно. Сегодня человек ежедневно обрабатывает объёмы данных, сопоставимые с объёмом информации, который люди получали за всю жизнь несколько столетий назад. Понимание этих процессов помогает эффективно учиться, избегать информационных перегрузок и принимать взвешенные решения.</p>
+        <p style="margin-top: 1rem;">На этом сайте вы найдёте подробное описание типов информационных процессов, примеры их проявления в жизни человека и технологиях, а также сможете предложить свои идеи для развития ресурса.</p>
+    </div>
+</div>
+
+<!-- СТРАНИЦА: ТИПЫ ИНФОРМАЦИОННЫХ ПРОЦЕССОВ -->
+<div id="typesPage" class="page">
+    <div class="card">
+        <h1>🧠 Типы информационных процессов человека</h1>
+        <p>Информационные процессы классифицируются по их роли в деятельности человека и технических системах. Рассмотрим каждый тип подробно.</p>
+    </div>
+
+    <div class="card">
+        <h2>1. Сбор (восприятие) информации</h2>
+        <p>Человек получает информацию через зрение, слух, осязание, обоняние и вкус. В технических системах сбор осуществляется с помощью датчиков, камер, микрофонов, ввода данных с клавиатуры. Качество сбора информации определяет достоверность последующих этапов.</p>
+    </div>
+
+    <div class="card">
+        <h2>2. Передача информации</h2>
+        <p>Передача может происходить устно (речь), письменно (текст), с помощью технических каналов (интернет, радиосвязь). Ключевые характеристики: скорость передачи, пропускная способность канала, помехоустойчивость. Примеры: обмен сообщениями, видеозвонки, трансляции.</p>
+    </div>
+
+    <div class="card">
+        <h2>3. Обработка информации</h2>
+        <p>Это преобразование исходных данных в новую форму. Включает: сортировку, вычисления, анализ, обобщение, поиск закономерностей. У человека обработка происходит в мозге, в компьютерах — с помощью алгоритмов и программ. Искусственный интеллект значительно расширяет возможности обработки больших данных.</p>
+    </div>
+
+    <div class="card">
+        <h2>4. Хранение информации</h2>
+        <p>Память человека (кратковременная, долговременная) и внешние носители: бумага, облачные сервисы, жёсткие диски, базы данных. Надёжное хранение обеспечивает доступ к знаниям в будущем. Современные тенденции — переход к цифровым архивам и облачным технологиям.</p>
+    </div>
+
+    <div class="card">
+        <h2>5. Использование информации</h2>
+        <p>Применение полученных знаний для принятия решений, обучения, создания новых продуктов, управления процессами. Эффективность использования информации напрямую влияет на конкурентоспособность специалиста и качество жизни человека.</p>
+    </div>
+
+    <div class="card">
+        <h2>📊 Взаимосвязь процессов</h2>
+        <p>Все перечисленные процессы взаимосвязаны и образуют непрерывный цикл. Например, учёный собирает данные (1), передаёт коллегам (2), обрабатывает статистически (3), сохраняет в базе (4) и использует для публикации (5). Сбои на любом этапе нарушают целостность информационного цикла.</p>
+    </div>
+</div>
+
+<!-- СТРАНИЦА: ПРЕДЛОЖЕНИЕ РЕДАКЦИИ -->
+<div id="suggestionPage" class="page">
+    <div class="card">
+        <h1>✍️ Предложение редакции</h1>
+        <p>Вы можете предложить тему для новой статьи, уточнить информацию или поделиться интересными примерами информационных процессов. Ваше мнение поможет сделать сайт полезнее.</p>
+    </div>
+
+    <div class="card">
+        <h2>📬 Форма отправки предложения</h2>
+        <form id="suggestionForm">
+            <div class="form-group">
+                <label>Ваше имя *</label>
+                <input type="text" id="suggestionName" required>
+            </div>
+            <div class="form-group">
+                <label>Email (для обратной связи)</label>
+                <input type="email" id="suggestionEmail">
+            </div>
+            <div class="form-group">
+                <label>Тип предложения *</label>
+                <select id="suggestionType">
+                    <option value="new_topic">Новая тема для статьи</option>
+                    <option value="correction">Уточнение/исправление информации</option>
+                    <option value="example">Пример информационного процесса</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ваше предложение *</label>
+                <textarea id="suggestionMessage" rows="5" required placeholder="Опишите, что вы хотели бы предложить или уточнить..."></textarea>
+            </div>
+            <button type="submit">Отправить предложение</button>
+        </form>
+        <div id="suggestionResult" style="margin-top: 1rem;"></div>
+    </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ -->
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Вход</h3>
+        <form id="authForm">
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="authUsername" required>
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="authPassword" required>
+            </div>
+            <button type="submit" id="authSubmitBtn">Войти</button>
+        </form>
+        <p id="authSwitchText" style="margin-top: 1rem; text-align: center; cursor: pointer; color: #2a5298;" onclick="toggleAuthMode()">Нет аккаунта? Зарегистрироваться</p>
+        <button onclick="closeAuthModal()" style="margin-top: 1rem; background: #95a5a6;">Закрыть</button>
+    </div>
+</div>
+
+<footer>
+    <p>InfoFlow — информационные процессы человека. Образовательный ресурс для студентов и всех интересующихся.</p>
+    <p style="margin-top: 0.5rem;">© 2026 InfoFlow | Все материалы носят ознакомительный характер</p>
+</footer>
+
+<script>
+    // ========== ДАННЫЕ ==========
+    let currentUser = null;
+    let users = JSON.parse(localStorage.getItem('infoflow_users')) || [
+        { username: "student", password: "123" }
+    ];
+    let suggestions = JSON.parse(localStorage.getItem('infoflow_suggestions')) || [];
+
+    function saveUsers() {
+        localStorage.setItem('infoflow_users', JSON.stringify(users));
+    }
+    function saveSuggestions() {
+        localStorage.setItem('infoflow_suggestions', JSON.stringify(suggestions));
+    }
+
+    // ========== АВТОРИЗАЦИЯ ==========
+    function showAuthModal(mode) {
+        window.authMode = mode;
+        document.getElementById('modalTitle').innerText = mode === 'login' ? 'Вход' : 'Регистрация';
+        document.getElementById('authSubmitBtn').innerText = mode === 'login' ? 'Войти' : 'Зарегистрироваться';
+        document.getElementById('authSwitchText').innerHTML = mode === 'login' ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти';
+        document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('authForm').reset();
+    }
+
+    function closeAuthModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+
+    function toggleAuthMode() {
+        const newMode = window.authMode === 'login' ? 'register' : 'login';
+        showAuthModal(newMode);
+    }
+
+    document.getElementById('authForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('authUsername').value.trim();
+        const password = document.getElementById('authPassword').value;
+
+        if (window.authMode === 'login') {
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('infoflow_currentUser', JSON.stringify(currentUser));
+                updateUI();
+                closeAuthModal();
+                alert(`Добро пожаловать, ${username}!`);
+            } else {
+                alert('Неверное имя пользователя или пароль');
+            }
+        } else {
+            if (users.find(u => u.username === username)) {
+                alert('Пользователь уже существует');
+                return;
+            }
+            users.push({ username, password });
+            saveUsers();
+            alert('Регистрация успешна! Теперь войдите.');
+            showAuthModal('login');
+        }
+    });
+
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('infoflow_currentUser');
+        updateUI();
+        alert('Вы вышли из аккаунта');
+    }
+
+    function updateUI() {
+        if (currentUser) {
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('currentUsername').innerText = currentUser.username;
+        } else {
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userInfo').style.display = 'none';
+        }
+    }
+
+    // ========== ПРЕДЛОЖЕНИЯ ==========
+    document.getElementById('suggestionForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('suggestionName').value.trim();
+        const email = document.getElementById('suggestionEmail').value.trim();
+        const type = document.getElementById('suggestionType').value;
+        const message = document.getElementById('suggestionMessage').value.trim();
+
+        if (!name || !message) {
+            alert('Пожалуйста, заполните имя и текст предложения');
+            return;
+        }
+
+        const newSuggestion = {
+            id: Date.now(),
+            name,
+            email,
+            type,
+            message,
+            date: new Date().toLocaleString(),
+            user: currentUser ? currentUser.username : null
+        };
+        suggestions.push(newSuggestion);
+        saveSuggestions();
+
+        document.getElementById('suggestionForm').reset();
+        const resultDiv = document.getElementById('suggestionResult');
+        resultDiv.innerHTML = '<p style="color: green; background: #e8f5e9; padding: 1rem; border-radius: 16px;">✅ Спасибо! Ваше предложение отправлено редакции. Мы рассмотрим его в ближайшее время.</p>';
+        setTimeout(() => { resultDiv.innerHTML = ''; }, 5000);
+    });
+
+    // ========== НАВИГАЦИЯ ==========
+    function showPage(pageName) {
+        const pages = ['home', 'types', 'suggestion'];
+        pages.forEach(p => {
+            const el = document.getElementById(`${p}Page`);
+            if (el) el.classList.remove('active');
+        });
+        document.getElementById(`${pageName}Page`).classList.add('active');
+        window.location.hash = pageName;
+    }
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    function init() {
+        const savedUser = localStorage.getItem('infoflow_currentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            if (!users.find(u => u.username === currentUser.username)) {
+                currentUser = null;
+                localStorage.removeItem('infoflow_currentUser');
+            }
+        }
+        updateUI();
+
+        const hash = window.location.hash.slice(1);
+        if (hash === 'home' || hash === 'types' || hash === 'suggestion') {
+            showPage(hash);
+        } else {
+            showPage('home');
+        }
+
+        window.showPage = showPage;
+        window.showAuthModal = showAuthModal;
+        window.closeAuthModal = closeAuthModal;
+        window.toggleAuthMode = toggleAuthMode;
+        window.logout = logout;
+    }
+
+    init();
+</script>
+</body>
+</html>
